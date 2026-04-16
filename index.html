@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechFest Tönning 2026 - Technologie Festival</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0e27;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Grid Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 200%;
+            background-image: 
+                linear-gradient(0deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridDrift 20s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes gridDrift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Neon Glow Effect */
+        @keyframes neonGlow {
+            0%, 100% { text-shadow: 0 0 10px #00ffff, 0 0 20px #ff00ff, 0 0 30px #00ffff; }
+            50% { text-shadow: 0 0 20px #00ffff, 0 0 30px #ff00ff, 0 0 40px #ff00ff; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Container */
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 100%);
+            border-radius: 10px;
+            margin-bottom: 60px;
+        }
+
+        .hero h1 {
+            font-size: 4em;
+            margin-bottom: 20px;
+            animation: neonGlow 2s ease-in-out infinite;
+            background: linear-gradient(90deg, #00ffff, #ff00ff, #00ffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+            letter-spacing: 3px;
+        }
+
+        .hero p {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            color: #00ffff;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .hero .date-location {
+            font-size: 1.1em;
+            color: #ff00ff;
+            margin-bottom: 40px;
+            font-weight: bold;
+        }
+
+        .cta-button {
+            background: linear-gradient(90deg, #00ffff, #ff00ff);
+            color: #0a0e27;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(255, 0, 255, 0.8);
+        }
+
+        /* Program Section */
+        .program {
+            margin: 80px 0;
+        }
+
+        .program h2 {
+            font-size: 2.5em;
+            margin-bottom: 50px;
+            text-align: center;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .program-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .program-card {
+            background: rgba(0, 255, 255, 0.05);
+            border: 2px solid #00ffff;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .program-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 0, 255, 0.2) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .program-card:hover {
+            border-color: #ff00ff;
+            background: rgba(255, 0, 255, 0.1);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+            transform: translateY(-5px);
+        }
+
+        .program-card:hover::before {
+            opacity: 1;
+        }
+
+        .program-card h3 {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            color: #ff00ff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .program-card p {
+            font-size: 0.95em;
+            color: #b0b0b0;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Newsletter Section */
+        .newsletter {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 100%);
+            border: 2px solid #00ffff;
+            border-radius: 10px;
+            padding: 50px;
+            text-align: center;
+            margin: 80px 0;
+        }
+
+        .newsletter h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .newsletter p {
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            color: #b0b0b0;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .newsletter-form input {
+            padding: 12px 20px;
+            font-size: 1em;
+            border: 2px solid #00ffff;
+            background: rgba(0, 255, 255, 0.05);
+            color: #e0e0e0;
+            border-radius: 5px;
+            min-width: 250px;
+            transition: all 0.3s;
+        }
+
+        .newsletter-form input:focus {
+            outline: none;
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .newsletter-form button {
+            padding: 12px 30px;
+            background: linear-gradient(90deg, #00ffff, #ff00ff);
+            color: #0a0e27;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+
+        .newsletter-form button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.8);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+            margin-top: 80px;
+        }
+
+        footer p {
+            margin: 10px 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5em;
+            }
+
+            .hero p {
+                font-size: 1.1em;
+            }
+
+            .program h2 {
+                font-size: 2em;
+            }
+
+            .newsletter {
+                padding: 30px;
+            }
+
+            .newsletter-form input {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>⚡ TECHFEST TÖNNING ⚡</h1>
+            <p>Das ultimative Technologie-Festival 2026</p>
+            <div class="date-location">
+                📍 Tönning, Schleswig-Holstein<br>
+                📅 15. - 17. August 2026
+            </div>
+            <a href="#newsletter" class="cta-button">🎫 Early Bird Tickets - 20% OFF</a>
+        </section>
+
+        <!-- Program Section -->
+        <section class="program">
+            <h2>🚀 Programm Highlights</h2>
+            <div class="program-grid">
+                <div class="program-card">
+                    <h3>🤖 AI Workshops</h3>
+                    <p>Hands-on Sessions mit Machine Learning und Generativen Modellen</p>
+                </div>
+                <div class="program-card">
+                    <h3>⌨️ Coding Battles</h3>
+                    <p>Live Programmier-Wettbewerbe mit Preisen für die Gewinner</p>
+                </div>
+                <div class="program-card">
+                    <h3>🚁 Drone Shows</h3>
+                    <p>Spektakuläre Licht- und Drohnen-Performances am Himmel</p>
+                </div>
+                <div class="program-card">
+                    <h3>🥽 VR/AR Experiences</h3>
+                    <p>Immersive Technologie-Erlebnisse zum Selbstprobieren</p>
+                </div>
+                <div class="program-card">
+                    <h3>🎤 Tech Talks</h3>
+                    <p>Vorträge von führenden Tech-Innovatoren und Gründern</p>
+                </div>
+                <div class="program-card">
+                    <h3>🛰️ Blockchain & Web3</h3>
+                    <p>Deep Dive in dezentrale Technologien und Kryptografie</p>
+                </div>
+                <div class="program-card">
+                    <h3>🎮 Gaming & Esports</h3>
+                    <p>Tournaments, Gaming-Hardware & kommende Game-Releases</p>
+                </div>
+                <div class="program-card">
+                    <h3>🌐 Startup Pitches</h3>
+                    <p>Junge Startups präsentieren ihre innovativen Ideen</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter Section -->
+        <section id="newsletter" class="newsletter">
+            <h2>✨ Newsletter anmelden</h2>
+            <p>Sei der Erste und erhalte alle Updates zum TechFest Tönning 2026</p>
+            <form class="newsletter-form" onsubmit="handleNewsletter(event)">
+                <input type="email" placeholder="deine@email.de" required>
+                <button type="submit">➜ Registrieren</button>
+            </form>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p><strong>TechFest Tönning 2026</strong> | Das Technologie-Festival Norddeutschlands</p>
+        <p>Kontakt: info@techfest-toenning.de | Tel: +49 (0)4861 123456</p>
+        <p style="margin-top: 20px; color: #00ffff;">Made with ⚡ and neon vibes</p>
+    </footer>
+
+    <script>
+        function handleNewsletter(event) {
+            event.preventDefault();
+            const email = event.target.querySelector('input[type="email"]').value;
+            alert(`✨ Danke! ${email} wurde registriert!\n\nDir erreichen die neuesten Updates zum TechFest 2026!`);
+            event.target.reset();
+        }
+    </script>
+</body>
+</html>
