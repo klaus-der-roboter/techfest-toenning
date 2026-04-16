@@ -19,7 +19,17 @@
             line-height: 1.6;
         }
 
-        /* Animated Grid Background */
+        /* WebGL Canvas Fullscreen Background */
+        #webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            display: block;
+        }
+
         .grid-bg {
             position: fixed;
             top: 0;
@@ -32,7 +42,7 @@
             background-size: 50px 50px;
             animation: drift 8s linear infinite;
             pointer-events: none;
-            z-index: 0;
+            z-index: 1;
         }
 
         @keyframes drift {
@@ -42,7 +52,7 @@
 
         .container {
             position: relative;
-            z-index: 1;
+            z-index: 2;
             max-width: 1200px;
             margin: 0 auto;
             padding: 40px 20px;
@@ -57,6 +67,7 @@
             border-radius: 10px;
             margin-bottom: 60px;
             box-shadow: 0 0 30px rgba(0, 255, 255, 0.2), inset 0 0 30px rgba(255, 0, 255, 0.05);
+            backdrop-filter: blur(10px);
         }
 
         .hero h1 {
@@ -120,6 +131,7 @@
             transition: all 0.3s ease;
             cursor: pointer;
             box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
         }
 
         .program-card:hover {
@@ -148,6 +160,7 @@
             padding: 60px 30px;
             margin: 80px 0;
             text-align: center;
+            backdrop-filter: blur(10px);
         }
 
         .ticketshop h2 {
@@ -172,6 +185,7 @@
             border-radius: 8px;
             padding: 30px;
             transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
         .ticket-card:hover {
@@ -230,6 +244,7 @@
             border-radius: 8px;
             padding: 30px;
             margin-top: 40px;
+            backdrop-filter: blur(10px);
         }
 
         .cart-section h3 {
@@ -287,6 +302,7 @@
             padding: 25px;
             border-radius: 8px;
             margin-top: 20px;
+            backdrop-filter: blur(10px);
         }
 
         .form-group {
@@ -335,6 +351,7 @@
             background: linear-gradient(135deg, rgba(0, 255, 255, 0.05), rgba(255, 0, 255, 0.05));
             border-radius: 10px;
             margin: 80px 0;
+            backdrop-filter: blur(10px);
         }
 
         .newsletter h2 {
@@ -380,6 +397,8 @@
             border-top: 1px solid rgba(0, 255, 255, 0.2);
             color: #b0b8e8;
             margin-top: 80px;
+            position: relative;
+            z-index: 2;
         }
 
         footer p {
@@ -436,6 +455,7 @@
     </style>
 </head>
 <body>
+    <canvas id="webgl-canvas"></canvas>
     <div class="grid-bg"></div>
 
     <div class="container">
@@ -566,6 +586,164 @@
     </footer>
 
     <script>
+        // ==================== WebGL Shader Setup ====================
+        const canvas = document.getElementById('webgl-canvas');
+        const gl = canvas.getContext('webgl2', { antialias: true, alpha: true });
+
+        if (!gl) {
+            console.error('WebGL2 nicht unterstützt, fallback zu WebGL');
+            const gl_fallback = canvas.getContext('webgl');
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            gl.viewport(0, 0, canvas.width, canvas.height);
+        }
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Vertex Shader
+        const vertexShaderSource = `#version 300 es
+            precision highp float;
+            
+            in vec4 position;
+            
+            void main() {
+                gl_Position = position;
+            }
+        `;
+
+        // Psychedelic Fragment Shader
+        const fragmentShaderSource = `#version 300 es
+            precision highp float;
+            
+            uniform float time;
+            uniform vec2 resolution;
+            
+            out vec4 outColor;
+            
+            float noise(vec2 p) {
+                return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+            }
+            
+            float voronoi(vec2 p) {
+                vec2 n = floor(p);
+                vec2 f = fract(p);
+                
+                float dist = 1.0;
+                for (int x = -1; x <= 1; x++) {
+                    for (int y = -1; y <= 1; y++) {
+                        vec2 neighbor = vec2(float(x), float(y));
+                        vec2 point = neighbor + noise(n + neighbor) * 0.5;
+                        dist = min(dist, length(f - point));
+                    }
+                }
+                return dist;
+            }
+            
+            void main() {
+                vec2 uv = gl_FragCoord.xy / resolution.xy;
+                
+                // Polar coordinates
+                vec2 center = resolution / 2.0;
+                vec2 p = gl_FragCoord.xy - center;
+                float r = length(p);
+                float angle = atan(p.y, p.x);
+                
+                // Psychedelic waves
+                float wave1 = sin(r * 0.01 + time * 0.5) * 0.5 + 0.5;
+                float wave2 = cos(angle * 3.0 + time * 0.3) * 0.5 + 0.5;
+                float wave3 = sin(r * 0.005 - time * 0.4) * 0.5 + 0.5;
+                
+                // Voronoi pattern
+                vec2 voronoiUV = uv * 5.0 + time * 0.2;
+                float vor = voronoi(voronoiUV);
+                
+                // Rainbow colors
+                vec3 col = vec3(
+                    0.5 + 0.5 * sin(angle + time * 0.5),
+                    0.5 + 0.5 * sin(angle + time * 0.5 + 2.094),
+                    0.5 + 0.5 * sin(angle + time * 0.5 + 4.189)
+                );
+                
+                // Kaleidoscope effect
+                float kale = mod(angle + time * 0.2, 3.14159 / 3.0);
+                col += vec3(wave1, wave2, wave3) * 0.5;
+                col *= vor * 0.8 + 0.2;
+                
+                // Intensity variation
+                float intensity = sin(time * 0.7) * 0.3 + 0.7;
+                col *= intensity;
+                
+                // Add some neon glow at edges
+                float edge = smoothstep(1.0, 0.0, length(uv - 0.5) * 2.0);
+                col += edge * vec3(0.0, 1.0, 1.0) * 0.3;
+                
+                outColor = vec4(col, 0.8);
+            }
+        `;
+
+        function compileShader(source, type) {
+            const shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                console.error('Shader compilation error:', gl.getShaderInfoLog(shader));
+                return null;
+            }
+            return shader;
+        }
+
+        const vertexShader = compileShader(vertexShaderSource, gl.VERTEX_SHADER);
+        const fragmentShader = compileShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
+
+        const program = gl.createProgram();
+        gl.attachShader(program, vertexShader);
+        gl.attachShader(program, fragmentShader);
+        gl.linkProgram(program);
+
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+            console.error('Program linking error:', gl.getProgramInfoLog(program));
+        }
+
+        gl.useProgram(program);
+
+        // Create fullscreen quad
+        const positions = new Float32Array([
+            -1.0, -1.0,
+             1.0, -1.0,
+            -1.0,  1.0,
+             1.0,  1.0,
+        ]);
+
+        const positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+
+        const positionAttribute = gl.getAttribLocation(program, 'position');
+        gl.enableVertexAttribArray(positionAttribute);
+        gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
+
+        const timeUniform = gl.getUniformLocation(program, 'time');
+        const resolutionUniform = gl.getUniformLocation(program, 'resolution');
+
+        // Render loop
+        let startTime = Date.now();
+        function render() {
+            const elapsedTime = (Date.now() - startTime) * 0.001;
+            
+            gl.uniform1f(timeUniform, elapsedTime);
+            gl.uniform2f(resolutionUniform, canvas.width, canvas.height);
+            
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            requestAnimationFrame(render);
+        }
+        render();
+
+        // ==================== Shopping Cart Logic ====================
         let cart = [];
 
         function addToCart(ticketType, price) {
@@ -602,7 +780,6 @@
                 checkoutBtn.style.display = 'block';
             }
 
-            // Calculate total
             const total = cart.reduce((sum, item) => sum + item.price, 0);
             document.getElementById('cart-total').textContent = total;
         }
@@ -623,34 +800,14 @@
             }
 
             const total = cart.reduce((sum, item) => sum + item.price, 0);
-            const ticketSummary = cart.map(item => `${item.type} (€${item.price})`).join(', ');
-
-            // Create email body
-            const emailBody = `
-Neue Ticketbestellung!
-
-Name: ${name}
-E-Mail: ${email}
-Telefon: ${phone}
-
-Tickets:
-${ticketSummary}
-
-Gesamtbetrag: €${total}
-
-Diese Bestellung wurde über die Website eingereicht.
-            `;
-
-            // Log to console (in real app, this would send to backend)
-            console.log('Bestellung:', emailBody);
-
-            showMessage(`✅ Bestellung erfolgreich! Bestätigungsmail wird gesendet an ${email}`);
+            showMessage(`Bestellung erfolgreich! Gesamtbetrag: €${total}`);
+            
             cart = [];
             updateCart();
-            document.getElementById('checkout-form').classList.add('hidden');
             document.getElementById('name').value = '';
             document.getElementById('email').value = '';
             document.getElementById('phone').value = '';
+            toggleCheckoutForm();
         }
 
         function subscribeNewsletter() {
@@ -659,7 +816,7 @@ Diese Bestellung wurde über die Website eingereicht.
                 showMessage('Bitte E-Mail eingeben!', 'error');
                 return;
             }
-            showMessage(`✅ Newsletter-Anmeldung erfolgreich! 📬`);
+            showMessage('Newsletter-Anmeldung erfolgreich!');
             document.getElementById('newsletter-email').value = '';
         }
 
